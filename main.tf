@@ -12,9 +12,7 @@ resource "aws_cloudwatch_metric_alarm" "jenkins" {
   alarm_actions             = [aws_sns_topic.alarm.arn]
   insufficient_data_actions = []
 
-  dimensions = {
-    InstanceId = data.aws_instances.jenkins.ids[0]
-  }
+  dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.jenkins.ids[0]}) : {InstanceId = data.aws_instances.jenkins.ids[0]}
 }
 
 resource "aws_cloudwatch_metric_alarm" "dev" {
@@ -31,9 +29,7 @@ resource "aws_cloudwatch_metric_alarm" "dev" {
   alarm_actions             = [aws_sns_topic.alarm.arn]
   insufficient_data_actions = []
 
-  dimensions = {
-    InstanceId = data.aws_instances.dev.ids[0]
-  }
+   dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.dev.ids[0]}) : {InstanceId = data.aws_instances.dev.ids[0]}
 }
 
 resource "aws_cloudwatch_metric_alarm" "prod" {
@@ -50,9 +46,7 @@ resource "aws_cloudwatch_metric_alarm" "prod" {
   alarm_actions             = [aws_sns_topic.alarm.arn]
   insufficient_data_actions = []
 
-  dimensions = {
-    InstanceId = data.aws_instances.prod.ids[0]
-  }
+  dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.prod.ids[0]}) : {InstanceId = data.aws_instances.prod.ids[0]}
 }
 
 resource "aws_sns_topic" "alarm" {
