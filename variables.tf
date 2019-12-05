@@ -19,3 +19,6 @@ variable instance_alarms {
   default = []
 }
 
+variable region{
+  description = "AWS region"
+}
