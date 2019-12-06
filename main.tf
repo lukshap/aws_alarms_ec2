@@ -9,7 +9,7 @@ resource "aws_cloudwatch_metric_alarm" "jenkins" {
   statistic                 = lookup(element(var.instance_alarms, count.index), "statistic")
   threshold                 = lookup(element(var.instance_alarms, count.index), "threshold")
   alarm_description         = lookup(element(var.instance_alarms, count.index), "alarm_description")
-  alarm_actions             = [aws_sns_topic.alarm.arn]
+  alarm_actions             = [data.aws_sns_topic.this.arn]
   insufficient_data_actions = []
 
   dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.jenkins.ids[0]}) : {InstanceId = data.aws_instances.jenkins.ids[0]}
@@ -26,7 +26,7 @@ resource "aws_cloudwatch_metric_alarm" "dev" {
   statistic                 = lookup(element(var.instance_alarms, count.index), "statistic")
   threshold                 = lookup(element(var.instance_alarms, count.index), "threshold")
   alarm_description         = lookup(element(var.instance_alarms, count.index), "alarm_description")
-  alarm_actions             = [aws_sns_topic.alarm.arn]
+  alarm_actions             = [data.aws_sns_topic.this.arn]
   insufficient_data_actions = []
 
    dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.dev.ids[0]}) : {InstanceId = data.aws_instances.dev.ids[0]}
@@ -43,16 +43,8 @@ resource "aws_cloudwatch_metric_alarm" "prod" {
   statistic                 = lookup(element(var.instance_alarms, count.index), "statistic")
   threshold                 = lookup(element(var.instance_alarms, count.index), "threshold")
   alarm_description         = lookup(element(var.instance_alarms, count.index), "alarm_description")
-  alarm_actions             = [aws_sns_topic.alarm.arn]
+  alarm_actions             = [data.aws_sns_topic.this.arn]
   insufficient_data_actions = []
 
   dimensions = contains(keys(element(var.instance_alarms, count.index)), "dimensions") ? merge(lookup(element(var.instance_alarms, count.index), "dimensions"), {InstanceId = data.aws_instances.prod.ids[0]}) : {InstanceId = data.aws_instances.prod.ids[0]}
-}
-
-resource "aws_sns_topic" "alarm" {
-  name = "alarms-topic"
-  delivery_policy = "${data.template_file.delivery_policy.rendered}"
-  provisioner "local-exec" {
-    command = "aws sns subscribe --topic-arn ${self.arn} --protocol email --notification-endpoint ${var.alarm_email} --region ${var.region}"
-  }
 }

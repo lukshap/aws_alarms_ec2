@@ -22,6 +22,6 @@ data "aws_instances" "prod" {
   instance_state_names = ["running", "stopped"]
 }
 
-data "template_file" "delivery_policy" {
-  template = "${file("${path.module}/user_data/delivery_policy.json")}"
-  }
+data "aws_sns_topic" "this" {
+  name = "alarms-topic"
+}
